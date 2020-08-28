@@ -95,35 +95,40 @@ def appendtosuffix(suffix):   #I propose this should be a seperate function, not
 # Create/Append to file with a list of Company Extensions
 def dropsuffix(dropsuffix):   #I propose this should be a seperate function, not in this class
     # Open file in read n write mode
-    with open("companysuffixfile.txt", "a+") as file_object:
+    with open("companysuffixfile.txt") as file_object:
         lines = file_object.read().splitlines()
+        terms = len(lines)
+        lines.pop(terms - dropsuffix - 1)
 
-        # Check if value exists, if not, then append to file
-        if suffix not in lines:
+    # Empty file to prevent doubling
+    open("companysuffixfile.txt", "w").close()
+
+    # Check if value exists, if not, then append to file
+    with open("companysuffixfile.txt", "a+") as file_object:
+        for ex in ext:
             file_object.seek(0)             # Move read cursor to the start of file.
             data = file_object.read(10)     # If file is not empty then append '\n'
             if len(data) > 0:
                 file_object.write("\n")     # Append text at the end of file
-            file_object.write(dropsuffix)
+            file_object.write(ex)
 
 ##OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
 
 # import pandas as pd
-import tkinter as tk
 # from tkinter import *
+import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox as mb
-from tkinter import Listbox
+# from tkinter import Listbox
 
 # Make/open a TKinter Window
 window = tk.Tk()
-# window.geometry("300x300")
 window.title("SavAi Cleaner Bot")
 
 
 ## 
 # def sholist():
-listbox = Listbox(window)#, selectmode=SINGLE)
+listbox = tk.Listbox(window)#, selectmode=SINGLE)
 listbox.grid(row=3, column=1)
 
 with open("companysuffixfile.txt") as f:
@@ -141,13 +146,8 @@ def append():
         pass
     else:
         appendtosuffix(e1.get().rstrip(" "))
-        # with open("companysuffixfile.txt") as f:
-        #     ext = f.read().splitlines()
-
-        #     for l in ext:
         listbox.insert(-1, e1.get().rstrip(" "))
         print ("not empty")
-    # print(e1.get())
 
 e1 = tk.Entry(window)#.grid(row=0) #.place(x=50, y=15) # Text box on window
 e1.grid(row=1,column=1)
@@ -157,17 +157,14 @@ tk.Label(window, text="Company Extension").grid(row=1)
 tk.Button(window, text="Add",command=append).grid(row=1,column=2)
 
 
-# Display current list of keywords
+# Drop from current list of keywords
 def exlist():
-    with open("companysuffixfile.txt") as f:
-        ext = f.read().splitlines()
-
-        # for l in ext:
-        print(ext)
-        mb.showinfo(title=None, message=ext)
-# def sholist():
-    # tk.Message(window, text = "Sup")
-tk.Button(window, text="Show List",command=exlist).grid(row=1,column=3)
+    sel = listbox.curselection()
+    print(sel)
+    dropsuffix(sel[0])
+    listbox.delete(tk.ACTIVE)
+    
+tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
     
 
 # Ask for file path
@@ -187,11 +184,9 @@ def cleanf():
         run.to_csv()
     except:
         #No file selected dialogue box
-        mb.showerror(title="Error", message="Error: File not selected")
+        tk.messagebox.showerror(title="Error", message="Error: File not selected")
 # Clean Button
-tk.Button(text='Clean', command=cleanf).grid(row=0,column=1) #whyy is pack fn used?, it was used in tutorials here
-# tk.Button(text='button', command=sholist).grid(row=3,column=0) #whyy is pack fn used?, it was used in tutorials here
-
+tk.Button(text='Clean', command=cleanf).grid(row=0,column=1)
 
 # Checkbox for new file or same file
 
