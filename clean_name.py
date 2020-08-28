@@ -9,7 +9,7 @@ class AutoBot: #Optimus Prime here we come!
 
     def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
         self.df = pd.read_csv(file_path)
-        self.nameloc = self.df.columns.get_loc("Name")  #Do not define in init, error if file doesnt have Name column
+        self.nameloc = self.df.columns.get_loc("Name")  # To Do: not define in init, error if file doesnt have Name column
 
 
     # Drop if full column/row empty
@@ -171,7 +171,7 @@ tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
 def filef():
     filef.path = askopenfilename()
 # # Pass the ask dialogue box through a button
-tk.Button(window, text="Open",command=filef).grid(row=0,column=0)
+tk.Button(window, text="Open",command=filef).grid(row=10,column=2)
 
 
 # Clean/Run Autobot
@@ -186,7 +186,7 @@ def cleanf():
         #No file selected dialogue box
         tk.messagebox.showerror(title="Error", message="Error: File not selected")
 # Clean Button
-tk.Button(text='Clean', command=cleanf).grid(row=0,column=1)
+tk.Button(text='Clean', command=cleanf).grid(row=10,column=3)
 
 # Checkbox for new file or same file
 
