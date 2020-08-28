@@ -1,0 +1,198 @@
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+
+import pandas as pd
+#"Auto(responder )Bot" a.k.a. AutoBot
+class AutoBot: #Optimus Prime here we come!
+    "shut up swaps"
+
+
+    def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
+        self.df = pd.read_csv(file_path)
+        self.nameloc = self.df.columns.get_loc("Name")  #Do not define in init, error if file doesnt have Name column
+
+
+    # Drop if full column/row empty
+    def emptycheck(self):
+        self.df = self.df.dropna(axis= 'columns', how='all')
+        self.df = self.df.dropna(axis= 'index', how='all')
+
+
+    # Make new columns if they do not exist
+    def makenamecols(self):
+        try:
+            self.df.insert(self.nameloc+1, "FirstName", None)
+            self.df.insert(self.nameloc+2, "MiddleName", None)
+            self.df.insert(self.nameloc+3, "LastName", None)
+        except:
+            return
+    
+
+    # Split original names into 3 columns and assign them to respective columns
+    def splitnames(self):   
+        for i in range(len(self.df["Name"])):
+            try:
+                a, *b, c = self.df.iat[i,self.nameloc].split()
+                s = " "
+                b = s.join(b)
+            except:
+                a = self.df.iat[i,self.nameloc]
+                b = None
+                c = None
+            self.df.iat[i,self.nameloc+1] = a
+            self.df.iat[i,self.nameloc+2] = b
+            self.df.iat[i,self.nameloc+3] = c
+    
+
+    # Send data back to original file to make changes
+    def to_csv(self):
+       self.df.to_csv('file_name.csv', index=False)
+    
+    # Find and replace company names using a set list
+    def FindReplace(self):
+        with open("companysuffixfile.txt") as f:
+            companysuffixlist = f.read().splitlines()
+        
+        # Function that returns length of input, needed for sorting
+        def myFunc(e):
+            return len(e)
+        companysuffixlist.sort(reverse=True, key=myFunc)
+
+        for suffix in companysuffixlist:
+            self.df["Company Name"] = [re.sub("\ " + suffix + "\.?$", '', idk) for idk in self.df["Company Name"]] 
+    
+
+    # Run all functions above, edit original file()
+    def fullsplit(self):
+        self.makenamecols()
+        self.emptycheck()
+        self.splitnames()
+        self.to_csv()
+        
+    def CompanySplit(self):
+        try:
+            self.appendtosuffix()
+            self.FindReplace()
+            self.to_csv()
+        except:            
+            self.FindReplace()
+            self.to_csv()
+
+# Create/Append to file with a list of Company Extensions
+def appendtosuffix(suffix):   #I propose this should be a seperate function, not in this class
+    # Open file in read n write mode
+    with open("companysuffixfile.txt", "a+") as file_object:
+        lines = file_object.read().splitlines()
+
+        # Check if value exists, if not, then append to file
+        if suffix not in lines:
+            file_object.seek(0)             # Move read cursor to the start of file.
+            data = file_object.read(10)     # If file is not empty then append '\n'
+            if len(data) > 0:
+                file_object.write("\n")     # Append text at the end of file
+            file_object.write(suffix)
+
+# Create/Append to file with a list of Company Extensions
+def dropsuffix(dropsuffix):   #I propose this should be a seperate function, not in this class
+    # Open file in read n write mode
+    with open("companysuffixfile.txt", "a+") as file_object:
+        lines = file_object.read().splitlines()
+
+        # Check if value exists, if not, then append to file
+        if suffix not in lines:
+            file_object.seek(0)             # Move read cursor to the start of file.
+            data = file_object.read(10)     # If file is not empty then append '\n'
+            if len(data) > 0:
+                file_object.write("\n")     # Append text at the end of file
+            file_object.write(dropsuffix)
+
+##OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
+
+# import pandas as pd
+import tkinter as tk
+# from tkinter import *
+from tkinter.filedialog import askopenfilename
+from tkinter import messagebox as mb
+from tkinter import Listbox
+
+# Make/open a TKinter Window
+window = tk.Tk()
+# window.geometry("300x300")
+window.title("SavAi Cleaner Bot")
+
+
+## 
+# def sholist():
+listbox = Listbox(window)#, selectmode=SINGLE)
+listbox.grid(row=3, column=1)
+
+with open("companysuffixfile.txt") as f:
+    ext = f.read().splitlines()
+
+    for l in ext:
+        listbox.insert(-1, l)
+
+
+# # Input button for keyword
+def append():
+    listbox.delete(0, -1)
+    if not e1.get().rstrip(" "):
+        print ("empty")
+        pass
+    else:
+        appendtosuffix(e1.get().rstrip(" "))
+        # with open("companysuffixfile.txt") as f:
+        #     ext = f.read().splitlines()
+
+        #     for l in ext:
+        listbox.insert(-1, e1.get().rstrip(" "))
+        print ("not empty")
+    # print(e1.get())
+
+e1 = tk.Entry(window)#.grid(row=0) #.place(x=50, y=15) # Text box on window
+e1.grid(row=1,column=1)
+# lab = tk.Label(window, width=15, text='Company Extension', anchor='w')
+tk.Label(window, text="Company Extension").grid(row=1)
+# tk.Label(window, text="Last Name").grid(row=1)
+tk.Button(window, text="Add",command=append).grid(row=1,column=2)
+
+
+# Display current list of keywords
+def exlist():
+    with open("companysuffixfile.txt") as f:
+        ext = f.read().splitlines()
+
+        # for l in ext:
+        print(ext)
+        mb.showinfo(title=None, message=ext)
+# def sholist():
+    # tk.Message(window, text = "Sup")
+tk.Button(window, text="Show List",command=exlist).grid(row=1,column=3)
+    
+
+# Ask for file path
+def filef():
+    filef.path = askopenfilename()
+# # Pass the ask dialogue box through a button
+tk.Button(window, text="Open",command=filef).grid(row=0,column=0)
+
+
+# Clean/Run Autobot
+def cleanf():
+    try:
+        run = AutoBot(filef.path)
+        run.emptycheck()
+        run.makenamecols()
+        run.splitnames()
+        run.to_csv()
+    except:
+        #No file selected dialogue box
+        mb.showerror(title="Error", message="Error: File not selected")
+# Clean Button
+tk.Button(text='Clean', command=cleanf).grid(row=0,column=1) #whyy is pack fn used?, it was used in tutorials here
+# tk.Button(text='button', command=sholist).grid(row=3,column=0) #whyy is pack fn used?, it was used in tutorials here
+
+
+# Checkbox for new file or same file
+
+tk.mainloop() #Needs this
