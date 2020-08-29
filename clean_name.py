@@ -71,7 +71,7 @@ class AutoBot: #Optimus Prime here we come!
         
     def CompanySplit(self):
         try:
-            self.appendtosuffix()
+            self.append_suffix()
             self.FindReplace()
             self.to_csv()
         except:            
@@ -79,7 +79,7 @@ class AutoBot: #Optimus Prime here we come!
             self.to_csv()
 
 # Create/Append to file with a list of Company Extensions
-def appendtosuffix(suffix):   #I propose this should be a seperate function, not in this class
+def append_suffix(suffix):   #I propose this should be a seperate function, not in this class
     # Open file in read n write mode
     with open("companysuffixfile.txt", "a+") as file_object:
         lines = file_object.read().splitlines()
@@ -92,13 +92,14 @@ def appendtosuffix(suffix):   #I propose this should be a seperate function, not
                 file_object.write("\n")     # Append text at the end of file
             file_object.write(suffix)
 
+
 # Create/Append to file with a list of Company Extensions
-def dropsuffix(dropsuffix):   #I propose this should be a seperate function, not in this class
+def drop_suffix(dropsuffix):   #I propose this should be a seperate function, not in this class
     # Open file in read n write mode
     with open("companysuffixfile.txt") as file_object:
         lines = file_object.read().splitlines()
-        terms = len(lines)
-        lines.pop(terms - dropsuffix - 1)
+    terms = len(lines)
+    lines.pop(terms - dropsuffix - 1)
 
     # Empty file to prevent doubling
     open("companysuffixfile.txt", "w").close()
@@ -117,7 +118,7 @@ def dropsuffix(dropsuffix):   #I propose this should be a seperate function, not
 # import pandas as pd
 # from tkinter import *
 import tkinter as tk
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfile 
 from tkinter import messagebox as mb
 # from tkinter import Listbox
 
@@ -125,6 +126,13 @@ from tkinter import messagebox as mb
 window = tk.Tk()
 window.title("SavAi Cleaner Bot")
 
+
+# Prettify!!
+# fontStyle = tk.font(family="Lucida Grande", size=20)
+tk.Label(window, text="SavAi",
+		 fg = "black",
+		#  bg = "yellow",
+		 font = "Verdana 20 bold").grid(row=0, column=1)
 
 ## 
 # def sholist():
@@ -145,7 +153,7 @@ def append():
         print ("empty")
         pass
     else:
-        appendtosuffix(e1.get().rstrip(" "))
+        append_suffix(e1.get().rstrip(" "))
         listbox.insert(-1, e1.get().rstrip(" "))
         print ("not empty")
 
@@ -161,7 +169,7 @@ tk.Button(window, text="Add",command=append).grid(row=1,column=2)
 def exlist():
     sel = listbox.curselection()
     print(sel)
-    dropsuffix(sel[0])
+    drop_suffix(sel[0])
     listbox.delete(tk.ACTIVE)
     
 tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
@@ -173,21 +181,35 @@ def filef():
 # # Pass the ask dialogue box through a button
 tk.Button(window, text="Open",command=filef).grid(row=10,column=2)
 
+# Ask for save path
+def files():
+    files.path = asksaveasfile()
+# # Pass the ask dialogue box through a button
+tk.Button(window, text="Save Location",command=files).grid(row=11,column=1)
+
 
 # Clean/Run Autobot
 def cleanf():
-    try:
-        run = AutoBot(filef.path)
-        run.emptycheck()
-        run.makenamecols()
-        run.splitnames()
-        run.to_csv()
-    except:
-        #No file selected dialogue box
-        tk.messagebox.showerror(title="Error", message="Error: File not selected")
+    if var1.get()== 1:      # Ideally this will be inside try fn
+        print("Hooray!!")
+    else:
+        try:
+            run = AutoBot(filef.path)
+            run.emptycheck()
+            run.makenamecols()
+            run.splitnames()
+            run.to_csv()
+        except:
+            #No file selected dialogue box
+            tk.messagebox.showerror(title="Error", message="Error: File not selected")
 # Clean Button
 tk.Button(text='Clean', command=cleanf).grid(row=10,column=3)
 
 # Checkbox for new file or same file
+var1 = tk.IntVar()
+tk.Checkbutton(window, text="Update Same File", variable=var1).grid(row=10, column=1)#, sticky=W)
+# var2 = tk.IntVar()
+# tk.Checkbutton(window, text="female", variable=var2).grid(row=1)#, sticky=W)
+
 
 tk.mainloop() #Needs this
