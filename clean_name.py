@@ -5,8 +5,6 @@ import pandas as pd
 import re
 #"Auto(responder )Bot" a.k.a. AutoBot
 class AutoBot: #Optimus Prime here we come!
-    "shut up swaps"
-
 
     def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
         self.df = pd.read_csv(file_path)
