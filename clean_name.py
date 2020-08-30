@@ -45,8 +45,8 @@ class AutoBot: #Optimus Prime here we come!
     
 
     # Send data back to original file to make changes
-    def to_csv(self):
-       self.df.to_csv('file_name.csv', index=False)
+    def to_csv(self,spath):
+       self.df.to_csv(spath + '/file_name.csv', index=False) # To Do: append date/time to keep unique file name
     
     # Find and replace company names using a set list
     def FindReplace(self):
@@ -64,8 +64,8 @@ class AutoBot: #Optimus Prime here we come!
 
     # Run all functions above, edit original file()
     def fullsplit(self):
-        self.makenamecols()
         self.emptycheck()
+        self.makenamecols()
         self.splitnames()
         self.to_csv()
         
@@ -115,17 +115,15 @@ def drop_suffix(dropsuffix):   #I propose this should be a seperate function, no
 
 ##OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
 
-# import pandas as pd
-# from tkinter import *
 import tkinter as tk
-from tkinter.filedialog import askopenfilename, asksaveasfile 
+from tkinter.filedialog import askopenfilename, asksaveasfile, askdirectory
 from tkinter import messagebox as mb
 # from tkinter import Listbox
 
 # Make/open a TKinter Window
 window = tk.Tk()
 window.title("SavAi Cleaner Bot")
-
+window.resizable(0, 0)          # Doesnt allow window resize
 
 # Prettify!!
 # fontStyle = tk.font(family="Lucida Grande", size=20)
@@ -177,39 +175,40 @@ tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
 
 # Ask for file path
 def filef():
-    filef.path = askopenfilename()
-# # Pass the ask dialogue box through a button
+    try:
+        mylabel.destroy()
+    except:
+        pass
+    filef.path = askopenfilename(title = "Select A File", filetypes=(("csv","*.csv"),("all files","*.*")) )
+    mylabel = tk.Label(window, text=filef.path).grid(row=10, column=1)
+# Pass the ask dialogue box through a button
 tk.Button(window, text="Open",command=filef).grid(row=10,column=2)
+tk.Label(window, text="File : ").grid(row=10)
 
 # Ask for save path
 def files():
-    files.path = asksaveasfile()
-# # Pass the ask dialogue box through a button
-tk.Button(window, text="Save Location",command=files).grid(row=11,column=1)
+    files.path = askdirectory()
+    print(files.path)
+    mylabel = tk.Label(window, text=files.path).grid(row=11, column=1)
+# Pass the ask dialogue box through a button
+tk.Button(window, text="Save Location",command=files).grid(row=11,column=2, columnspan =2)
+tk.Label(window, text="Save Path : ").grid(row=11)
 
 
 # Clean/Run Autobot
 def cleanf():
-    if var1.get()== 1:      # Ideally this will be inside try fn
-        print("Hooray!!")
-    else:
-        try:
-            run = AutoBot(filef.path)
-            run.emptycheck()
-            run.makenamecols()
-            run.splitnames()
-            run.to_csv()
-        except:
-            #No file selected dialogue box
-            tk.messagebox.showerror(title="Error", message="Error: File not selected")
+    try:
+        run = AutoBot(filef.path)
+        run.emptycheck()
+        run.makenamecols()
+        run.splitnames()
+        run.to_csv(files.path)
+        run.CompanySplit()
+    except:
+        #No file selected dialogue box
+        tk.messagebox.showerror(title="Error", message="Error: File not selected")
 # Clean Button
 tk.Button(text='Clean', command=cleanf).grid(row=10,column=3)
-
 # Checkbox for new file or same file
-var1 = tk.IntVar()
-tk.Checkbutton(window, text="Update Same File", variable=var1).grid(row=10, column=1)#, sticky=W)
-# var2 = tk.IntVar()
-# tk.Checkbutton(window, text="female", variable=var2).grid(row=1)#, sticky=W)
-
 
 tk.mainloop() #Needs this
