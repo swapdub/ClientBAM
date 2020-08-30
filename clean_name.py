@@ -2,6 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 
 import pandas as pd
+import re
 #"Auto(responder )Bot" a.k.a. AutoBot
 class AutoBot: #Optimus Prime here we come!
     "shut up swaps"
@@ -45,8 +46,11 @@ class AutoBot: #Optimus Prime here we come!
     
 
     # Send data back to original file to make changes
-    def to_csv(self,spath):
-       self.df.to_csv(spath + '/file_name.csv', index=False) # To Do: append date/time to keep unique file name
+    def to_csv(self, spath):#, spath = None):
+        # try:
+        self.df.to_csv(spath + '/file_name.csv', index=False) # To Do: append date/time to keep unique file name
+        # except:    
+            # self.df.to_csv('file_name.csv', index=False) # To Do: append date/time to keep unique file name
     
     # Find and replace company names using a set list
     def FindReplace(self):
@@ -59,8 +63,11 @@ class AutoBot: #Optimus Prime here we come!
         companysuffixlist.sort(reverse=True, key=myFunc)
 
         for suffix in companysuffixlist:
-            self.df["Company Name"] = [re.sub("\ " + suffix + "\.?$", '', idk) for idk in self.df["Company Name"]] 
+            self.df["Company Name"] = [re.sub("\ \,?\ ?"+suffix+"\.?$", '', idk) for idk in self.df["Company Name"]] 
+            self.df["Company Name"] = [re.sub("\,\ ?"+suffix+"\.?$", '', idk) for idk in self.df["Company Name"]] 
     
+    # "\ \,?\ ?"x "\.?" | "\,\ ?" x "\.?"
+    # "\ " + suffix + "\.?$"
 
     # Run all functions above, edit original file()
     def fullsplit(self):
@@ -70,13 +77,8 @@ class AutoBot: #Optimus Prime here we come!
         self.to_csv()
         
     def CompanySplit(self):
-        try:
-            self.append_suffix()
-            self.FindReplace()
-            self.to_csv()
-        except:            
-            self.FindReplace()
-            self.to_csv()
+        self.FindReplace()
+        self.to_csv()
 
 # Create/Append to file with a list of Company Extensions
 def append_suffix(suffix):   #I propose this should be a seperate function, not in this class
@@ -98,23 +100,23 @@ def drop_suffix(dropsuffix):   #I propose this should be a seperate function, no
     # Open file in read n write mode
     with open("companysuffixfile.txt") as file_object:
         lines = file_object.read().splitlines()
-    terms = len(lines)
-    lines.pop(terms - dropsuffix - 1)
+        terms = len(lines)
+        lines.pop(terms - dropsuffix - 1)
 
     # Empty file to prevent doubling
     open("companysuffixfile.txt", "w").close()
 
     # Check if value exists, if not, then append to file
     with open("companysuffixfile.txt", "a+") as file_object:
-        for ex in ext:
+        for ex in lines:
             file_object.seek(0)             # Move read cursor to the start of file.
             data = file_object.read(10)     # If file is not empty then append '\n'
             if len(data) > 0:
                 file_object.write("\n")     # Append text at the end of file
             file_object.write(ex)
 
-##OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
 
+# OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
 import tkinter as tk
 from tkinter.filedialog import askopenfilename, asksaveasfile, askdirectory
 from tkinter import messagebox as mb
@@ -137,11 +139,14 @@ tk.Label(window, text="SavAi",
 listbox = tk.Listbox(window)#, selectmode=SINGLE)
 listbox.grid(row=3, column=1)
 
-with open("companysuffixfile.txt") as f:
-    ext = f.read().splitlines()
+try:
+    with open("companysuffixfile.txt", "r+") as f:
+        ext = f.read().splitlines()
+        for l in ext:
+            listbox.insert(-1, l)
+except:    
+    open("companysuffixfile.txt", "a+").close()
 
-    for l in ext:
-        listbox.insert(-1, l)
 
 
 # # Input button for keyword
@@ -156,12 +161,11 @@ def append():
         print ("not empty")
 
 e1 = tk.Entry(window)#.grid(row=0) #.place(x=50, y=15) # Text box on window
-e1.grid(row=1,column=1)
+e1.grid(row= 1, column= 1)
 # lab = tk.Label(window, width=15, text='Company Extension', anchor='w')
 tk.Label(window, text="Company Extension").grid(row=1)
 # tk.Label(window, text="Last Name").grid(row=1)
 tk.Button(window, text="Add",command=append).grid(row=1,column=2)
-
 
 # Drop from current list of keywords
 def exlist():
@@ -171,8 +175,8 @@ def exlist():
     listbox.delete(tk.ACTIVE)
     
 tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
-    
 
+    
 # Ask for file path
 def filef():
     try:
@@ -187,7 +191,7 @@ tk.Label(window, text="File : ").grid(row=10)
 
 # Ask for save path
 def files():
-    files.path = askdirectory()
+    files.path = askdirectory(title = "Select Save Location")
     print(files.path)
     mylabel = tk.Label(window, text=files.path).grid(row=11, column=1)
 # Pass the ask dialogue box through a button
@@ -198,15 +202,21 @@ tk.Label(window, text="Save Path : ").grid(row=11)
 # Clean/Run Autobot
 def cleanf():
     try:
-        run = AutoBot(filef.path)
-        run.emptycheck()
-        run.makenamecols()
-        run.splitnames()
-        run.to_csv(files.path)
-        run.CompanySplit()
+        try:
+            run = AutoBot(filef.path)
+            try:
+                run.emptycheck()
+                run.makenamecols()
+                run.splitnames()
+                run.FindReplace()
+                run.to_csv(files.path)
+            except:
+                tk.messagebox.showerror(title="Error", message="Please select save file location.")
+        except:
+            tk.messagebox.showerror(title="Error", message="No file selected. Please select a file to be cleaned.")
     except:
         #No file selected dialogue box
-        tk.messagebox.showerror(title="Error", message="Error: File not selected")
+        tk.messagebox.showerror(title="Error", message="Unknown Error: Please contact the developers at SavAI")
 # Clean Button
 tk.Button(text='Clean', command=cleanf).grid(row=10,column=3)
 # Checkbox for new file or same file

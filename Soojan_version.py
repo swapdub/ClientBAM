@@ -1,37 +1,9 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
-# %%
 import pandas as pd
+import json
 
-
-# %%
-
-file_path = "D:\SavAi\ClientBAM\seamless2@clientbam.com-contacts-2020-06-30-08-03-23-cleaned - Copy.csv"
-try:
-  base_df = pd.read_csv(file_path+"cleaned_data.csv") #path of database file
-  main_df = base_df.drop_duplicates()
-except:
-  main_df = pd.DataFrame(columns = ['UpdatedAt', 'Name', 'FirstName', 'MiddleName', 'LastName', 'Title',
-       'Company Name', 'Website', 'List', 'Intel', 'Contact Location',
-       'ContactCity', 'ContactState', 'ContactStateAbbr', 'ContactCountry',
-       'ContactCountryAlpha2', 'ContactCountryAlpha3', 'ContactCountryNumeric',
-       'Company Location', 'CompanyCity', 'CompanyState', 'CompanyStateAbbr',
-       'CompanyCountry', 'CompanyCountryAlpha2', 'CompanyCountryAlpha3',
-       'CompanyCountryNumeric', 'CompanyStaffCountRange',
-       'CompanyRevenueRange', 'Email1', 'EmValidation1', 'Total AI1', 'Email2',
-       'EmValidation2', 'Total AI2', 'ContactPhone1', 'CompanyPhone1',
-       'ContactPhone2', 'CompanyPhone2', 'ContactPhone3', 'CompanyPhone3',
-       'LinkedInContactURL', 'LinkedInCompanyURL', 'AdvertisingIntelligence',
-       'AlexaScore', 'CompanyNews', 'EmployeeReviews', 'GoogleFinance',
-       'GoogleResearch', 'JobPostings', 'LocalSportsTeams', 'LocalWeather',
-       'News', 'PaidSearchIntelligence', 'PaidSearchKeywordsIntelligence',
-       'SearchMarketingIntelligence', 'SecFilings', 'SeoResearch',
-       'SimilarWebsites', 'SocialMediaMentions', 'SocialMediaPosts',
-       'SocialPosts', 'Tweets', 'WebTechnologies', 'WebsiteAudit',
-       'WebsiteAudit2', 'WebsiteGrader', 'Whois', 'Wikipedia', 'YahooFinance'])
-
-with open(file_path+"company_suffix_list.json") as f:  #how to fix path of main file?
-    suffix_list = json.loads(f.read())  
+file_path1 = "D:\SavAi\ClientBAM\seamless2@clientbam.com-contacts-2020-06-30-08-03-23-cleaned - Copy.csv"
+with open("potato.json") as f:  #how to fix path of main file?
+    suffix_list = json.loads(f.read())
 
 
 class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
@@ -40,6 +12,29 @@ class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
     def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
         self.df = pd.read_csv(file_path)
         self.nameloc = self.df.columns.get_loc("Name")  #Do not define in init, error if file doesnt have Name column
+
+        try:
+            self.base_df = pd.read_csv("cleaned_data.csv") #path of database file
+            self.main_df = base_df.drop_duplicates()
+        except:
+            self.main_df = pd.DataFrame(columns = ['UpdatedAt', 'Name', 'FirstName', 'MiddleName', 'LastName', 'Title',
+                'Company Name', 'Website', 'List', 'Intel', 'Contact Location',
+                'ContactCity', 'ContactState', 'ContactStateAbbr', 'ContactCountry',
+                'ContactCountryAlpha2', 'ContactCountryAlpha3', 'ContactCountryNumeric',
+                'Company Location', 'CompanyCity', 'CompanyState', 'CompanyStateAbbr',
+                'CompanyCountry', 'CompanyCountryAlpha2', 'CompanyCountryAlpha3',
+                'CompanyCountryNumeric', 'CompanyStaffCountRange',
+                'CompanyRevenueRange', 'Email1', 'EmValidation1', 'Total AI1', 'Email2',
+                'EmValidation2', 'Total AI2', 'ContactPhone1', 'CompanyPhone1',
+                'ContactPhone2', 'CompanyPhone2', 'ContactPhone3', 'CompanyPhone3',
+                'LinkedInContactURL', 'LinkedInCompanyURL', 'AdvertisingIntelligence',
+                'AlexaScore', 'CompanyNews', 'EmployeeReviews', 'GoogleFinance',
+                'GoogleResearch', 'JobPostings', 'LocalSportsTeams', 'LocalWeather',
+                'News', 'PaidSearchIntelligence', 'PaidSearchKeywordsIntelligence',
+                'SearchMarketingIntelligence', 'SecFilings', 'SeoResearch',
+                'SimilarWebsites', 'SocialMediaMentions', 'SocialMediaPosts',
+                'SocialPosts', 'Tweets', 'WebTechnologies', 'WebsiteAudit',
+                'WebsiteAudit2', 'WebsiteGrader', 'Whois', 'Wikipedia', 'YahooFinance'])
 
     # Drop if full column/row empty
     def emptycheck(self):
@@ -69,16 +64,8 @@ class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
             self.df.iat[i,self.nameloc+1] = a
             self.df.iat[i,self.nameloc+2] = b
             self.df.iat[i,self.nameloc+3] = c
-            main_df = main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
+            self.main_df = self.main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
 
-
-    def append_to_suffix(self, new_suffix):
-        suffix_set = set(suffix_list)
-        suffix_set.add(new_suffix)
-        suffix_list = list(suffix_set)
-        out_file = open(file_path+"company_suffix_list.json", "w")      
-        json.dump(suffix_list, out_file, indent = 6)      
-        out_file.close()
 
     # Find and replace company names using a set list
     def FindReplace(self):
@@ -97,7 +84,22 @@ class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
         self.df.drop_duplicates()
 
     def save_to_csv(self):
-       main_df.to_csv(output_file_path+'.csv', index=False) #tkinter will allow to pick filepath and file name
-       main_df.to_csv(file_path+'.csv', index=False) #tkinter will allow to pick filepath and file name
+       self.main_df.to_csv(output_file_path+'.csv', index=False) #tkinter will allow to pick filepath and file name
+       self.main_df.to_csv(file_path+'.csv', index=False) #tkinter will allow to pick filepath and file name
 
 
+def append_to_suffix(new_suffix):
+    with open("potato.json") as f:  #how to fix path of main file?
+        suffix_list = json.loads(f.read())
+    suffix_set = set(suffix_list)
+    suffix_set.add(new_suffix)
+    suffix_list = list(suffix_set)
+    out_file = open("potato.json", "w")      
+    json.dump(suffix_list, out_file, indent = 6)      
+    out_file.close()
+
+outpath = "D:\SavAi\ClientBAM\soojan"
+run = AutoBot(file_path1)
+append_to_suffix("LLC")
+run.fullsplit()
+run.save_to_csv()
