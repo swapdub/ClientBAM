@@ -1,15 +1,37 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
-
 import pandas as pd
 import re
+
+suffix_file = "potato.json"
 #"Auto(responder )Bot" a.k.a. AutoBot
 class AutoBot: #Optimus Prime here we come!
 
     def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
         self.df = pd.read_csv(file_path)
         self.nameloc = self.df.columns.get_loc("Name")  # To Do: not define in init, error if file doesnt have Name column
-
+        try:
+            self.base_df = pd.read_csv("cleaned_data.csv") #path of database file
+            self.main_df = base_df.drop_duplicates()
+        except:
+            self.main_df = pd.DataFrame(columns = ['UpdatedAt', 'Name', 'FirstName', 'MiddleName', 'LastName', 'Title',
+                'Company Name', 'Website', 'List', 'Intel', 'Contact Location',
+                'ContactCity', 'ContactState', 'ContactStateAbbr', 'ContactCountry',
+                'ContactCountryAlpha2', 'ContactCountryAlpha3', 'ContactCountryNumeric',
+                'Company Location', 'CompanyCity', 'CompanyState', 'CompanyStateAbbr',
+                'CompanyCountry', 'CompanyCountryAlpha2', 'CompanyCountryAlpha3',
+                'CompanyCountryNumeric', 'CompanyStaffCountRange',
+                'CompanyRevenueRange', 'Email1', 'EmValidation1', 'Total AI1', 'Email2',
+                'EmValidation2', 'Total AI2', 'ContactPhone1', 'CompanyPhone1',
+                'ContactPhone2', 'CompanyPhone2', 'ContactPhone3', 'CompanyPhone3',
+                'LinkedInContactURL', 'LinkedInCompanyURL', 'AdvertisingIntelligence',
+                'AlexaScore', 'CompanyNews', 'EmployeeReviews', 'GoogleFinance',
+                'GoogleResearch', 'JobPostings', 'LocalSportsTeams', 'LocalWeather',
+                'News', 'PaidSearchIntelligence', 'PaidSearchKeywordsIntelligence',
+                'SearchMarketingIntelligence', 'SecFilings', 'SeoResearch',
+                'SimilarWebsites', 'SocialMediaMentions', 'SocialMediaPosts',
+                'SocialPosts', 'Tweets', 'WebTechnologies', 'WebsiteAudit',
+                'WebsiteAudit2', 'WebsiteGrader', 'Whois', 'Wikipedia', 'YahooFinance'])
 
     # Drop if full column/row empty
     def emptycheck(self):
@@ -41,18 +63,21 @@ class AutoBot: #Optimus Prime here we come!
             self.df.iat[i,self.nameloc+1] = a
             self.df.iat[i,self.nameloc+2] = b
             self.df.iat[i,self.nameloc+3] = c
+            self.main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
     
 
     # Send data back to original file to make changes
     def to_csv(self, spath):#, spath = None):
-        # try:
         self.df.to_csv(spath + '/file_name.csv', index=False) # To Do: append date/time to keep unique file name
-        # except:    
-            # self.df.to_csv('file_name.csv', index=False) # To Do: append date/time to keep unique file name
+
+        output_file_path = "myfiles/user_file"
+        file_path = "myfiles/cleaned_data"
+        self.main_df.to_csv(output_file_path + '.csv', index=False) #tkinter will allow to pick filepath and file name
+        self.main_df.to_csv(file_path + '.csv', index=False)
     
     # Find and replace company names using a set list
     def FindReplace(self):
-        with open("companysuffixfile.txt") as f:
+        with open(suffix_file) as f:
             companysuffixlist = f.read().splitlines()
         
         # Function that returns length of input, needed for sorting
@@ -81,7 +106,7 @@ class AutoBot: #Optimus Prime here we come!
 # Create/Append to file with a list of Company Extensions
 def append_suffix(suffix):   #I propose this should be a seperate function, not in this class
     # Open file in read n write mode
-    with open("companysuffixfile.txt", "a+") as file_object:
+    with open(suffix_file, "a+") as file_object:
         lines = file_object.read().splitlines()
 
         # Check if value exists, if not, then append to file
@@ -96,16 +121,16 @@ def append_suffix(suffix):   #I propose this should be a seperate function, not 
 # Create/Append to file with a list of Company Extensions
 def drop_suffix(dropsuffix):   #I propose this should be a seperate function, not in this class
     # Open file in read n write mode
-    with open("companysuffixfile.txt") as file_object:
+    with open(suffix_file) as file_object:
         lines = file_object.read().splitlines()
         terms = len(lines)
         lines.pop(terms - dropsuffix - 1)
 
     # Empty file to prevent doubling
-    open("companysuffixfile.txt", "w").close()
+    open(suffix_file, "w").close()
 
     # Check if value exists, if not, then append to file
-    with open("companysuffixfile.txt", "a+") as file_object:
+    with open(suffix_file, "a+") as file_object:
         for ex in lines:
             file_object.seek(0)             # Move read cursor to the start of file.
             data = file_object.read(10)     # If file is not empty then append '\n'
@@ -116,6 +141,7 @@ def drop_suffix(dropsuffix):   #I propose this should be a seperate function, no
 
 # OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
 import tkinter as tk
+from tkinter import *
 from tkinter.filedialog import askopenfilename, asksaveasfile, askdirectory
 from tkinter import messagebox as mb
 # from tkinter import Listbox
@@ -138,12 +164,12 @@ listbox = tk.Listbox(window)#, selectmode=SINGLE)
 listbox.grid(row=3, column=1)
 
 try:
-    with open("companysuffixfile.txt", "r+") as f:
+    with open(suffix_file, "r+") as f:
         ext = f.read().splitlines()
         for l in ext:
             listbox.insert(-1, l)
 except:    
-    open("companysuffixfile.txt", "a+").close()
+    open(suffix_file, "a+").close()
 
 
 
@@ -177,12 +203,14 @@ tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
     
 # Ask for file path
 def filef():
-    try:
-        mylabel.destroy()
-    except:
-        pass
     filef.path = askopenfilename(title = "Select A File", filetypes=(("csv","*.csv"),("all files","*.*")) )
-    mylabel = tk.Label(window, text=filef.path).grid(row=10, column=1)
+    # myLabel = tk.Label(window, text="").grid(row=10, column=1)
+    # myLabel.pack_forget()
+    myLabel = tk.Label(window, text=filef.path).grid(row=10, column=1)
+    # try:
+    # except:
+    #     pass
+    # mylabel = tk.Label(window, text=filef.path).grid(row=10, column=1)
 # Pass the ask dialogue box through a button
 tk.Button(window, text="Open",command=filef).grid(row=10,column=2)
 tk.Label(window, text="File : ").grid(row=10)

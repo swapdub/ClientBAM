@@ -1,10 +1,12 @@
 import pandas as pd
 import json
 
+# @soojan: issue was self.main_df = self.main_df.append, sent it to inf loop
+
 file_path1 = "D:\SavAi\ClientBAM\seamless2@clientbam.com-contacts-2020-06-30-08-03-23-cleaned - Copy.csv"
 with open("potato.json") as f:  #how to fix path of main file?
     suffix_list = json.loads(f.read())
-
+print(suffix_list)
 
 class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
     "autobot"
@@ -64,7 +66,7 @@ class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
             self.df.iat[i,self.nameloc+1] = a
             self.df.iat[i,self.nameloc+2] = b
             self.df.iat[i,self.nameloc+3] = c
-            self.main_df = self.main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
+            self.main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
 
 
     # Find and replace company names using a set list
@@ -77,15 +79,18 @@ class AutoBot: #Optimus Prime here we come!    ##class AutoBot():
     # Run all functions above, edit original file()
     # Dont link functions inside a class, do this outside and call individual functions to execute task : Shetty
     def fullsplit(self):
-        self.emptycheck()
+        # self.emptycheck()
         self.makenamecols()
         self.splitnames()
+        print(self.main_df)
         self.FindReplace()
         self.df.drop_duplicates()
 
     def save_to_csv(self):
-       self.main_df.to_csv(output_file_path+'.csv', index=False) #tkinter will allow to pick filepath and file name
-       self.main_df.to_csv(file_path+'.csv', index=False) #tkinter will allow to pick filepath and file name
+        output_file_path = "myfiles/user_file"
+        file_path = "myfiles/cleaned_data"
+        self.main_df.to_csv(output_file_path +'.csv', index=False) #tkinter will allow to pick filepath and file name
+        self.main_df.to_csv(file_path +'.csv', index=False) #tkinter will allow to pick filepath and file name
 
 
 def append_to_suffix(new_suffix):
@@ -99,7 +104,12 @@ def append_to_suffix(new_suffix):
     out_file.close()
 
 outpath = "D:\SavAi\ClientBAM\soojan"
-run = AutoBot(file_path1)
-append_to_suffix("LLC")
-run.fullsplit()
-run.save_to_csv()
+test = AutoBot(file_path1)
+with open("companysuffixfile.txt", "r") as tfile:
+    sufflist = tfile.read().splitlines()
+
+for n in sufflist:
+    append_to_suffix(n)
+
+test.fullsplit()
+test.save_to_csv()
