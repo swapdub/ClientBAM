@@ -3,36 +3,14 @@
 import pandas as pd
 import re
 
-suffix_file = "potato.json"
+suffix_file = "companysuffixfile.txt" # i still do not know why we need to complicate it with json
 #"Auto(responder )Bot" a.k.a. AutoBot
 class AutoBot: #Optimus Prime here we come!
 
-    def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
+    def __init__(self,file_path, namecol):   # Asking for variable in initializing hampers none file class functionality
         self.df = pd.read_csv(file_path)
-        self.nameloc = self.df.columns.get_loc("Name")  # To Do: not define in init, error if file doesnt have Name column
-        try:
-            self.base_df = pd.read_csv("cleaned_data.csv") #path of database file
-            self.main_df = base_df.drop_duplicates()
-        except:
-            self.main_df = pd.DataFrame(columns = ['UpdatedAt', 'Name', 'FirstName', 'MiddleName', 'LastName', 'Title',
-                'Company Name', 'Website', 'List', 'Intel', 'Contact Location',
-                'ContactCity', 'ContactState', 'ContactStateAbbr', 'ContactCountry',
-                'ContactCountryAlpha2', 'ContactCountryAlpha3', 'ContactCountryNumeric',
-                'Company Location', 'CompanyCity', 'CompanyState', 'CompanyStateAbbr',
-                'CompanyCountry', 'CompanyCountryAlpha2', 'CompanyCountryAlpha3',
-                'CompanyCountryNumeric', 'CompanyStaffCountRange',
-                'CompanyRevenueRange', 'Email1', 'EmValidation1', 'Total AI1', 'Email2',
-                'EmValidation2', 'Total AI2', 'ContactPhone1', 'CompanyPhone1',
-                'ContactPhone2', 'CompanyPhone2', 'ContactPhone3', 'CompanyPhone3',
-                'LinkedInContactURL', 'LinkedInCompanyURL', 'AdvertisingIntelligence',
-                'AlexaScore', 'CompanyNews', 'EmployeeReviews', 'GoogleFinance',
-                'GoogleResearch', 'JobPostings', 'LocalSportsTeams', 'LocalWeather',
-                'News', 'PaidSearchIntelligence', 'PaidSearchKeywordsIntelligence',
-                'SearchMarketingIntelligence', 'SecFilings', 'SeoResearch',
-                'SimilarWebsites', 'SocialMediaMentions', 'SocialMediaPosts',
-                'SocialPosts', 'Tweets', 'WebTechnologies', 'WebsiteAudit',
-                'WebsiteAudit2', 'WebsiteGrader', 'Whois', 'Wikipedia', 'YahooFinance'])
-
+        self.nameloc = self.df.columns.get_loc(namecol)  # To Do: not define in init, error if file doesnt have Name column
+       
     # Drop if full column/row empty
     def emptycheck(self):
         self.df = self.df.dropna(axis= 'columns', how='all')
@@ -63,20 +41,20 @@ class AutoBot: #Optimus Prime here we come!
             self.df.iat[i,self.nameloc+1] = a
             self.df.iat[i,self.nameloc+2] = b
             self.df.iat[i,self.nameloc+3] = c
-            self.main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
+            # self.main_df.append(self.df, ignore_index = True)          #only works as intended if both csv files have the same columns in the same order (I think)
     
 
     # Send data back to original file to make changes
     def to_csv(self, spath):#, spath = None):
         self.df.to_csv(spath + '/file_name.csv', index=False) # To Do: append date/time to keep unique file name
 
-        output_file_path = "myfiles/user_file"
-        file_path = "myfiles/cleaned_data"
-        self.main_df.to_csv(output_file_path + '.csv', index=False) #tkinter will allow to pick filepath and file name
-        self.main_df.to_csv(file_path + '.csv', index=False)
+        # output_file_path = "myfiles/user_file"
+        # file_path = "myfiles/cleaned_data"
+        # self.main_df.to_csv(output_file_path + '.csv', index=False) #tkinter will allow to pick filepath and file name
+        # self.main_df.to_csv(file_path + '.csv', index=False)
     
     # Find and replace company names using a set list
-    def FindReplace(self):
+    def FindReplace(self, companycol):
         with open(suffix_file) as f:
             companysuffixlist = f.read().splitlines()
         
@@ -86,8 +64,8 @@ class AutoBot: #Optimus Prime here we come!
         companysuffixlist.sort(reverse=True, key=myFunc)
 
         for suffix in companysuffixlist:
-            self.df["Company Name"] = [re.sub("\ \,?\ ?"+suffix+"\.?$", '', idk) for idk in self.df["Company Name"]] 
-            self.df["Company Name"] = [re.sub("\,\ ?"+suffix+"\.?$", '', idk) for idk in self.df["Company Name"]] 
+            self.df[companycol] = [re.sub("\ \,?\ ?"+suffix+"\.?$", '', idk) for idk in self.df[companycol]] 
+            self.df[companycol] = [re.sub("\,\ ?"+suffix+"\.?$", '', idk) for idk in self.df[companycol]] 
     
     # "\ \,?\ ?"x "\.?" | "\,\ ?" x "\.?"
     # "\ " + suffix + "\.?$"
@@ -142,6 +120,7 @@ def drop_suffix(dropsuffix):   #I propose this should be a seperate function, no
 # OMG WE CAN UNIRONICALLY NAME THE BOT OPTIMUS HOLY SHIT, IT'S LATIN FOR "BEST" FUCK YEAH BITCHES
 import tkinter as tk
 from tkinter import *
+from tkinter import ttk
 from tkinter.filedialog import askopenfilename, asksaveasfile, askdirectory
 from tkinter import messagebox as mb
 # from tkinter import Listbox
@@ -151,12 +130,23 @@ window = tk.Tk()
 window.title("SavAi Cleaner Bot")
 window.resizable(0, 0)          # Doesnt allow window resize
 
+
+# list of used variables
+name_col_dropdown_row = 10
+comp_name_dropdown_row = 11
+select_file_row = 12
+save_file_row = select_file_row + 1
+
+
+
 # Prettify!!
 # fontStyle = tk.font(family="Lucida Grande", size=20)
 tk.Label(window, text="SavAi",
 		 fg = "black",
 		#  bg = "yellow",
 		 font = "Verdana 20 bold").grid(row=0, column=1)
+
+
 
 ## 
 # def sholist():
@@ -184,11 +174,9 @@ def append():
         listbox.insert(-1, e1.get().rstrip(" "))
         print ("not empty")
 
-e1 = tk.Entry(window)#.grid(row=0) #.place(x=50, y=15) # Text box on window
+e1 = tk.Entry(window) # Text box on window
 e1.grid(row= 1, column= 1)
-# lab = tk.Label(window, width=15, text='Company Extension', anchor='w')
 tk.Label(window, text="Company Extension").grid(row=1)
-# tk.Label(window, text="Last Name").grid(row=1)
 tk.Button(window, text="Add",command=append).grid(row=1,column=2)
 
 # Drop from current list of keywords
@@ -200,51 +188,99 @@ def exlist():
     
 tk.Button(window, text="Delete",command=exlist).grid(row=1,column=3)
 
-    
+# Let User choose which is Name Column in a dropbox from file to split
+tk.Label(window, text="Name Column :").grid(row=name_col_dropdown_row, sticky=W)
+
+tk.Label(window, text="Company Column :", anchor="w").grid(row=comp_name_dropdown_row, sticky=W)
+
+
 # Ask for file path
 def filef():
-    filef.path = askopenfilename(title = "Select A File", filetypes=(("csv","*.csv"),("all files","*.*")) )
-    # myLabel = tk.Label(window, text="").grid(row=10, column=1)
-    # myLabel.pack_forget()
-    myLabel = tk.Label(window, text=filef.path).grid(row=10, column=1)
-    # try:
-    # except:
-    #     pass
-    # mylabel = tk.Label(window, text=filef.path).grid(row=10, column=1)
+    global user_sel_input_file_path
+    user_sel_input_file_path = askopenfilename(title = "Select A File", 
+                            filetypes=(("csv","*.csv"),("all files","*.*")) )
+    
+    myLabel = tk.Label(window, text=user_sel_input_file_path).grid(   
+                                                    row=select_file_row, 
+                                                    column=1   
+                                                    )
+    col_options = [
+
+    ]
+    df2 = pd.read_csv(user_sel_input_file_path)
+
+    for head in df2.columns:
+        col_options.append(head)
+
+
+
+    def Name_click(event):
+        global name_col
+        name_col = Name_combo.get()
+
+    Name_combo = ttk.Combobox(window, value = col_options)
+    Name_combo.grid(row=name_col_dropdown_row, column = 1)
+    Name_combo.bind("<<ComboboxSelected>>", Name_click)
+
+
+    def Company_click(event):
+        global Comp_col
+        Comp_col = Company_box.get()
+
+    Company_box = ttk.Combobox(window, value = col_options)
+    Company_box.grid(row=comp_name_dropdown_row, column = 1)
+    # Company_box.current(0)
+    Company_box.bind("<<ComboboxSelected>>", Company_click)
+
+
 # Pass the ask dialogue box through a button
-tk.Button(window, text="Open",command=filef).grid(row=10,column=2)
-tk.Label(window, text="File : ").grid(row=10)
+tk.Button(window, text="Open",command=filef).grid(row=select_file_row, column=2)
+tk.Label(window, text="File : ").grid(row=select_file_row, sticky=W)
 
 # Ask for save path
 def files():
-    files.path = askdirectory(title = "Select Save Location")
-    print(files.path)
-    mylabel = tk.Label(window, text=files.path).grid(row=11, column=1)
+    global user_sel_output_file_path
+    user_sel_output_file_path = askdirectory(title = "Select Save Location")
+    print(user_sel_output_file_path)
+
+    mylabel = tk.Label(window, text=user_sel_output_file_path).grid(
+                                                    row=save_file_row, 
+                                                    column=1
+                                                    )
 # Pass the ask dialogue box through a button
-tk.Button(window, text="Save Location",command=files).grid(row=11,column=2, columnspan =2)
-tk.Label(window, text="Save Path : ").grid(row=11)
+tk.Button(window, text="Save Location",command=files).grid( row=save_file_row,
+                                                            column=2, 
+                                                            columnspan =2)
+
+tk.Label(window, text="Save Path : ").grid(row=save_file_row, sticky=W)
 
 
 # Clean/Run Autobot
 def cleanf():
     try:
         try:
-            run = AutoBot(filef.path)
+            run = AutoBot(user_sel_input_file_path, name_col)
             try:
                 run.emptycheck()
                 run.makenamecols()
                 run.splitnames()
-                run.FindReplace()
-                run.to_csv(files.path)
+                try:
+                    run.FindReplace(Comp_col)
+                    try:
+                        run.to_csv(user_sel_output_file_path)
+                    except:
+                        tk.messagebox.showerror(title="Error", message="Please select save file location")
+                except:
+                    tk.messagebox.showerror(title="Error", message="Select Company Name column from drop down")
             except:
-                tk.messagebox.showerror(title="Error", message="Please select save file location.")
+                tk.messagebox.showerror(title="Error", message="Unexpected error")
         except:
-            tk.messagebox.showerror(title="Error", message="No file selected. Please select a file to be cleaned.")
+            tk.messagebox.showerror(title="Error", message="No file selected. Please select a file to be cleaned")
     except:
         #No file selected dialogue box
         tk.messagebox.showerror(title="Error", message="Unknown Error: Please contact the developers at SavAI")
 # Clean Button
-tk.Button(text='Clean', command=cleanf).grid(row=10,column=3)
+tk.Button(text='Clean', command=cleanf).grid(row=select_file_row,column=3)
 # Checkbox for new file or same file
 
 tk.mainloop() #Needs this
