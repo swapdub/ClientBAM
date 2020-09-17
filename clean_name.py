@@ -2,6 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 import pandas as pd
 import re
+import os
 
 suffix_file = "companysuffixfile.txt" # i still do not know why we need to complicate it with json
 #"Auto(responder )Bot" a.k.a. AutoBot
@@ -45,8 +46,10 @@ class AutoBot: #Optimus Prime here we come!
     
 
     # Send data back to original file to make changes
-    def to_csv(self, spath):#, spath = None):
-        self.df.to_csv(spath + '/file_name.csv', index=False) # To Do: append date/time to keep unique file name
+    def to_csv(self, spath,user_file):#, spath = None):
+        file_name = os.path.basename(user_file)
+        s1 = "/cleaned - "
+        self.df.to_csv(spath + s1 + file_name, index=False) # To Do: append date/time to keep unique file name
 
         # output_file_path = "myfiles/user_file"
         # file_path = "myfiles/cleaned_data"
@@ -267,7 +270,7 @@ def cleanf():
                 try:
                     run.FindReplace(Comp_col)
                     try:
-                        run.to_csv(user_sel_output_file_path)
+                        run.to_csv(user_sel_output_file_path, user_sel_input_file_path)
                     except:
                         tk.messagebox.showerror(title="Error", message="Please select save file location")
                 except:
