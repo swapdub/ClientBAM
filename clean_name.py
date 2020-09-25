@@ -8,9 +8,9 @@ suffix_file = "companysuffixfile.txt" # i still do not know why we need to compl
 #"Auto(responder )Bot" a.k.a. AutoBot
 class AutoBot: #Optimus Prime here we come!
 
-    def __init__(self,file_path, namecol):   # Asking for variable in initializing hampers none file class functionality
+    def __init__(self,file_path):   # Asking for variable in initializing hampers none file class functionality
         self.df = pd.read_csv(file_path)
-        self.nameloc = self.df.columns.get_loc(namecol)  # To Do: not define in init, error if file doesnt have Name column
+        
        
     # Drop if full column/row empty
     def emptycheck(self):
@@ -19,7 +19,8 @@ class AutoBot: #Optimus Prime here we come!
 
 
     # Make new columns if they do not exist
-    def makenamecols(self):
+    def makenamecols(self, namecol):
+        self.nameloc = self.df.columns.get_loc(namecol)  # To Do: not define in init, error if file doesnt have Name column
         try:
             self.df.insert(self.nameloc+1, "FirstName", None)
             self.df.insert(self.nameloc+2, "MiddleName", None)
@@ -29,7 +30,8 @@ class AutoBot: #Optimus Prime here we come!
     
 
     # Split original names into 3 columns and assign them to respective columns
-    def splitnames(self):   
+    def splitnames(self, namecol):
+        self.nameloc = self.df.columns.get_loc(namecol)  # To Do: not define in init, error if file doesnt have Name column
         for i in range(len(self.df["Name"])):
             try:
                 a, *b, c = self.df.iat[i,self.nameloc].split()
@@ -135,6 +137,10 @@ window.resizable(0, 0)          # Doesnt allow window resize
 
 
 # list of used variables
+name_col = None
+Comp_col = None
+user_sel_input_file_path = None
+user_sel_output_file_path = None
 name_col_dropdown_row = 10
 comp_name_dropdown_row = 11
 select_file_row = 12
@@ -219,6 +225,7 @@ def filef():
 
     def Name_click(event):
         global name_col
+        name_col = None
         name_col = Name_combo.get()
 
     Name_combo = ttk.Combobox(window, value = col_options)
@@ -228,6 +235,7 @@ def filef():
 
     def Company_click(event):
         global Comp_col
+        Comp_col = None
         Comp_col = Company_box.get()
 
     Company_box = ttk.Combobox(window, value = col_options)
@@ -261,27 +269,48 @@ tk.Label(window, text="Save Path : ").grid(row=save_file_row, sticky=W)
 # Clean/Run Autobot
 def cleanf():
     try:
-        try:
-            run = AutoBot(user_sel_input_file_path, name_col)
-            try:
+        if user_sel_input_file_path:
+            run = AutoBot(user_sel_input_file_path)
+        
+            
+            if name_col == None and Comp_col == None and user_sel_input_file_path != None:
+                tk.messagebox.showerror(title="Error", message="Neither Name nor Company column is selected.")
+            elif name_col == None:
+                tk.messagebox.showwarning(title="Error", message="No Name Column selected, Names will not be split")
+            elif Comp_col == None:
+                tk.messagebox.showwarning(title="Error", message="No Company Column selected, company extensions will not be dropped")
+            else:
+                pass
+                # tk.messagebox.showerror(title="Error", message="Unexpected Error")
+
+
+            if name_col:
                 run.emptycheck()
-                run.makenamecols()
-                run.splitnames()
-                try:
-                    run.FindReplace(Comp_col)
-                    try:
-                        run.to_csv(user_sel_output_file_path, user_sel_input_file_path)
-                    except:
-                        tk.messagebox.showerror(title="Error", message="Please select save file location")
-                except:
-                    tk.messagebox.showerror(title="Error", message="Select Company Name column from drop down")
-            except:
-                tk.messagebox.showerror(title="Error", message="Unexpected error")
-        except:
+                run.makenamecols(name_col)
+                run.splitnames(name_col)
+            else:
+                pass
+
+            if Comp_col:
+                run.FindReplace(Comp_col)
+            else:
+                pass
+
+            if user_sel_output_file_path:
+                if name_col == None and Comp_col == None:
+                    pass
+                else:
+                    run.to_csv(user_sel_output_file_path, user_sel_input_file_path)
+            else:
+                tk.messagebox.showerror(title="Error", message="Please select save file location")
+
+
+        else:
             tk.messagebox.showerror(title="Error", message="No file selected. Please select a file to be cleaned")
+        #     #No file selected dialogue box
     except:
-        #No file selected dialogue box
         tk.messagebox.showerror(title="Error", message="Unknown Error: Please contact the developers at SavAI")
+
 # Clean Button
 tk.Button(text='Clean', command=cleanf).grid(row=select_file_row,column=3)
 # Checkbox for new file or same file
