@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <title>Work in Progress</title>
+    </head>
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Dropdown button
+      </button>
+      <div class="dropdown-menu">
+        <button class="dropdown-item" type="button">test</button>
+        <!-- {%for item in data%}
+          <button class="dropdown-item" type="button"> {{ item }} </button>
+        {%endfor%} -->
+      </div>
+    </div>
+    <body>
+      <!-- <span class="border border-warning"> -->
+        <div class = container>
+          <center>
+              <!-- <style> 
+                h1 {
+                    text-align:center;
+                    color: orange; 
+                }
+            </style>  -->
+              <h1><center>SavAi</center></h1>
+              <div class="form-horizontal">
+                <label for="exampleFormControlInput1">Email address</label>
+                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+              </div>
+              
+          </center>
+        </div>
+      <!-- </span> -->
+      <div class="btn-group">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown button
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" type="button"> test </button>
+          {%for item in data%}
+            <button class="dropdown-item" type="button"> {{ item }} </button>
+          {%endfor%}
+        </div>
+      </div>
+    </body>
+</html>

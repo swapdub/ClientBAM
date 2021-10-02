@@ -1,0 +1,46 @@
+#:kivy 1.11.1
+<Button>:
+    font_size:20
+    color: 0, 0.8, 0.7,1
+    background_color: 0, 0, 1, 0.5
+
+
+<MyGridLayout>:
+
+    GridLayout:
+        cols:3
+        rows:2
+        spacing:10
+        size: root.width, root.height
+        
+        Spinner:
+            text: "Home"
+            values: "First", "Second", "Third"
+            id: spinner_id
+            on_text: root.spinner_clicked(spinner_id.text)
+        
+        Spinner:
+            text: "Home"
+            values: "First", "Second", "Third"
+            id: spinner_id
+            on_text: root.spinner_clicked(spinner_id.text)
+
+        Spinner:
+            text: "Home"
+            values: "First", "Second", "Third"
+            id: spinner_id
+            on_text: root.spinner_clicked(spinner_id.text)
+
+        GridLayout:
+            cols:1
+            spacing:10
+            
+            Label:
+                text: "Enter new extension"
+            
+            Button:
+                # size_hint: 0.5, 1
+                text: "CEnter new extension"
+            
+            Button:
+                text: "right new extension"

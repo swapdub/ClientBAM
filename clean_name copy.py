@@ -1,3 +1,5 @@
+# I am testing if we could have used return instead of assigning global variables inside functions
+
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 import pandas as pd
@@ -209,7 +211,7 @@ tk.Label(window, text="Company Column :", anchor="w").grid(row=comp_name_dropdow
 
 # Ask for file path
 def filef():
-    global user_sel_input_file_path
+    # global user_sel_input_file_path
     user_sel_input_file_path = askopenfilename(title = "Select A File", 
                             filetypes=(("csv","*.csv"),("all files","*.*")) )
     
@@ -228,25 +230,29 @@ def filef():
 
 
     def Name_click(event):
-        global name_col
+        # global name_col
         name_col = None
         name_col = Name_combo.get()
+        return name_col
 
     Name_combo = ttk.Combobox(window, value = col_options)
     Name_combo.grid(row=name_col_dropdown_row, column = 1)
     Name_combo.bind("<<ComboboxSelected>>", Name_click)
+    
 
 
     def Company_click(event):
-        global Comp_col
+        # global Comp_col
         Comp_col = None
         Comp_col = Company_box.get()
+        return Comp_col
 
     Company_box = ttk.Combobox(window, value = col_options)
     Company_box.grid(row=comp_name_dropdown_row, column = 1)
     # Company_box.current(0)
     Company_box.bind("<<ComboboxSelected>>", Company_click)
 
+    return user_sel_input_file_path
 
 # Pass the ask dialogue box through a button
 tk.Button(window, text="Open",command=filef).grid(row=select_file_row, column=2)
@@ -254,7 +260,7 @@ tk.Label(window, text="File : ").grid(row=select_file_row, sticky=W)
 
 # Ask for save path
 def files():
-    global user_sel_output_file_path
+    # global user_sel_output_file_path
     user_sel_output_file_path = askdirectory(title = "Select Save Location")
     print(user_sel_output_file_path)
 
@@ -262,6 +268,8 @@ def files():
                                                     row=save_file_row, 
                                                     column=1
                                                     )
+    return user_sel_output_file_path
+
 # Pass the ask dialogue box through a button
 tk.Button(window, text="Save Location",command=files).grid( row=save_file_row,
                                                             column=2, 
